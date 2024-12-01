@@ -1,11 +1,11 @@
-import kotlin.math.abs
 
-class Day01 : AbstractSolver("01", 11, 31) {
+class Day02 : AbstractSolver("02", TODO(), TODO()) {
 
-   private data class Input(val list1: List<Int>, val list2: List<Int>)
+    private data class Input(val list1: List<Int>, val list2: List<Int>)
 
     private fun createInput(input: List<String>, printInput: Boolean = false): Input {
         val inRegex = """(\d+)\s+(\d+)""".toRegex()
+        TODO()
         val list1: MutableList<Int> = mutableListOf()
         val list2: MutableList<Int> = mutableListOf()
         for (line: String in input) {
@@ -20,18 +20,16 @@ class Day01 : AbstractSolver("01", 11, 31) {
 
     override fun solvePart1(input: List<String>): Int {
         val (list1, list2) = createInput(input)
-        val sorted1 = list1.sorted()
-        val sorted2 = list2.sorted()
 
-        val solution = sorted1.zip(sorted2).sumOf { (i1, i2) -> abs(i1 - i2) }
+        val solution = TODO()
 
         return solution
     }
 
     override fun solvePart2(input: List<String>): Int {
         val (list1, list2) = createInput(input)
-        val groupedList2 = list2.groupBy { i -> i }
-        val solution = list1.sumOf { i1 -> (groupedList2[i1]?.count() ?: 0) * i1 }
+
+        val solution = TODO()
 
         return solution
     }
