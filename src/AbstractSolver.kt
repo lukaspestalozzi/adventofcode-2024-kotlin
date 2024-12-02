@@ -6,9 +6,9 @@ abstract class AbstractSolver(val dayNr: String, val expectedTestPart1: Int, val
 
     val logger = KotlinLogging.logger {}
 
-    abstract fun solvePart1(input: List<String>): Int
+    abstract fun solvePart1(inputLines: List<String>): Int
 
-    abstract fun solvePart2(input: List<String>): Int
+    abstract fun solvePart2(inputLines: List<String>): Int
 
     /**
      * Reads lines from the given input txt file.

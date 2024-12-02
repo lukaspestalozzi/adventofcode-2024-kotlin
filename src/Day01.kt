@@ -18,8 +18,8 @@ class Day01 : AbstractSolver("01", 11, 31) {
         return createdInput
     }
 
-    override fun solvePart1(input: List<String>): Int {
-        val (list1, list2) = createInput(input)
+    override fun solvePart1(inputLines: List<String>): Int {
+        val (list1, list2) = createInput(inputLines)
         val sorted1 = list1.sorted()
         val sorted2 = list2.sorted()
 
@@ -28,8 +28,8 @@ class Day01 : AbstractSolver("01", 11, 31) {
         return solution
     }
 
-    override fun solvePart2(input: List<String>): Int {
-        val (list1, list2) = createInput(input)
+    override fun solvePart2(inputLines: List<String>): Int {
+        val (list1, list2) = createInput(inputLines)
         val groupedList2 = list2.groupBy { i -> i }
         val solution = list1.sumOf { i1 -> (groupedList2[i1]?.count() ?: 0) * i1 }
 
