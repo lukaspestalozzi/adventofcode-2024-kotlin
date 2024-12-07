@@ -1,11 +1,4 @@
-class Day07 : AbstractSolver("07", 3749, 0) {
-
-    companion object {
-        const val OBSTACLE = '#'
-        const val FLOOR = '.'
-        const val OUTSIDE = '-'
-        const val START = '^'
-    }
+class Day07 : AbstractSolver("07", 3749, 11387) {
 
     private data class Case(val result: Long, val list: List<Long>)
     private data class Input(val cases: List<Case>)
@@ -27,16 +20,12 @@ class Day07 : AbstractSolver("07", 3749, 0) {
         val input = createInput(inputLines)
         var solution: Long = 0
         for (case in input.cases) {
-            solution += solveCase(case)
+            solution += solve1(case.result, 0, currIdx = 0, remaining = case.list)
         }
         return solution
     }
 
-    private fun solveCase(case: Case): Long {
-        return solve(case.result, 0, currIdx = 0, remaining = case.list)
-    }
-
-    private fun solve(expectedResult: Long, acc: Long, currIdx: Int, remaining: List<Long>): Long {
+    private fun solve1(expectedResult: Long, acc: Long, currIdx: Int, remaining: List<Long>): Long {
         if (currIdx >= remaining.count()) {
             return if (acc == expectedResult) acc else 0
         }
@@ -44,19 +33,43 @@ class Day07 : AbstractSolver("07", 3749, 0) {
             return 0
         }
         val nextNbr = remaining[currIdx]
-        val add = solve(expectedResult, acc + nextNbr, currIdx = currIdx + 1, remaining = remaining)
+        val add = solve1(expectedResult, acc + nextNbr, currIdx = currIdx + 1, remaining = remaining)
         if (add != 0L) {
             return add
         }
-        val mul = solve(expectedResult, acc * nextNbr, currIdx = currIdx + 1, remaining = remaining)
+        val mul = solve1(expectedResult, acc * nextNbr, currIdx = currIdx + 1, remaining = remaining)
         return mul
     }
 
 
     override fun solvePart2(inputLines: List<String>): Number {
-        val solution = 0L
-
+        val input = createInput(inputLines)
+        var solution: Long = 0
+        for (case in input.cases) {
+            solution += solve2(case.result, 0, currIdx = 0, remaining = case.list)
+        }
         return solution
+    }
+
+    private fun solve2(expectedResult: Long, acc: Long, currIdx: Int, remaining: List<Long>): Long {
+        if (currIdx >= remaining.count()) {
+            return if (acc == expectedResult) acc else 0
+        }
+        if (acc > expectedResult) {
+            return 0
+        }
+        val nextNbr = remaining[currIdx]
+        val add = solve2(expectedResult, acc + nextNbr, currIdx = currIdx + 1, remaining = remaining)
+        if (add != 0L) {
+            return add
+        }
+        val mul = solve2(expectedResult, acc * nextNbr, currIdx = currIdx + 1, remaining = remaining)
+        if(mul != 0L){
+            return mul
+        }
+        val concat = solve2(expectedResult, "$acc$nextNbr".toLong(), currIdx = currIdx + 1, remaining = remaining)
+
+        return concat
     }
 }
 
