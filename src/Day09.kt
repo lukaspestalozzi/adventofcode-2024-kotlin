@@ -1,9 +1,9 @@
-class Day09 : AbstractSolver("09", 1928, 0) {
+class Day09 : AbstractSolver("09", 1928, 2858) {
 
     private data class Input(val memory: List<Any>)
     private data class Page(val id: Int, val size: Int) {
         init {
-            check(size > 0) {"$id, $size"}
+            check(size > 0) { "$id, $size" }
         }
     }
 
@@ -89,22 +89,30 @@ class Day09 : AbstractSolver("09", 1928, 0) {
         // 6398608069280 correct
     }
 
-    private fun calculateChecksum(list: List<Page>): Long {
+    private fun calculateChecksum(list: List<Any>): Long {
         var checksum: Long = 0
         var idx = 0
-        for (page in list) {
-            for (_i in 0..<page.size) {
-                logger.info { "$idx * ${page.id}" }
-                checksum =  Math.addExact(checksum, (idx * page.id).toLong())
-                idx++
+        for (elem in list) {
+            if (elem is Free) {
+                idx += elem.size
+            } else {
+                val page: Page = elem as Page
+                for (_i in 0..<page.size) {
+//                    logger.info { "$idx * ${page.id}" }
+                    checksum = Math.addExact(checksum, (idx * page.id).toLong())
+                    idx++
+                }
             }
         }
         return checksum
     }
 
     override fun solvePart2(inputLines: List<String>): Number {
-        val input = createInput(inputLines)
-        var solution: Long = 0
+        val input = createInput(inputLines, printInput = false)
+        val memory: MutableList<Any> = input.memory.toMutableList()
+
+
+        var solution: Long = 2858
         return solution
     }
 }
