@@ -47,7 +47,13 @@ class Day09 : AbstractSolver("09", 1928, 0) {
                         do {
                             last = memory.removeLast()
                         } while (last is Free)
-                        val lastPage: Page = if (last is Page) last else throw IllegalArgumentException("not a page")
+
+                        // ??? Remove the last Free space for some reason. without it the result is false
+                        while (memory.last() is Free) {
+                            memory.removeLast()
+                        }
+
+                        val lastPage: Page = last as Page
 
                         // fit last page into the free slot
                         if (lastPage.size <= freeSize) {
@@ -80,6 +86,7 @@ class Day09 : AbstractSolver("09", 1928, 0) {
         val solution = calculateChecksum(resultList)
         return solution
         // 6398872404185 too high
+        // 6398608069280 correct
     }
 
     private fun calculateChecksum(list: List<Page>): Long {
