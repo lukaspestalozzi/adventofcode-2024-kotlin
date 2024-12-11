@@ -1,6 +1,10 @@
+import java.util.*
+
 class Day11 : AbstractSolver("11", 55312, 0) {
 
     private data class Input(val case: List<Long>)
+
+    private val SINGLETON_1 = Collections.singletonList(1L)
 
     private fun createInput(input: List<String>, printInput: Boolean = false): Input {
         check(input.size == 1)
@@ -20,23 +24,23 @@ class Day11 : AbstractSolver("11", 55312, 0) {
         if (remainingBlinks == 0) {
             return 1
         }
+        return applyRules(n).sumOf { applyRulesAndCountStones(it, remainingBlinks - 1) }
+    }
+
+    private fun applyRules(n: Long): List<Long> {
         // rule 1
         if (n == 0L) {
-            return applyRulesAndCountStones(1, remainingBlinks - 1)
+            return SINGLETON_1
         }
         // rule 2
         else if (hasEvenNumberOfDigits(n)) {
             val s = n.toString()
             val middleIdx = s.length / 2
-            val stone1 = s.substring(0, middleIdx).toLong()
-            val stone2 = s.substring(middleIdx).toLong()
-            val firstResult = applyRulesAndCountStones(stone1, remainingBlinks - 1)
-            val secondResult = applyRulesAndCountStones(stone2, remainingBlinks - 1)
-            return firstResult + secondResult
+            return listOf(s.substring(0, middleIdx).toLong(), s.substring(middleIdx).toLong())
         }
         // rule 3
         else {
-            return applyRulesAndCountStones(n * 2024, remainingBlinks - 1)
+            return Collections.singletonList(n * 2024L)
         }
     }
 
@@ -49,4 +53,5 @@ class Day11 : AbstractSolver("11", 55312, 0) {
         var solution: Long = input.sumOf { applyRulesAndCountStones(it, 75) }
         return solution
     }
+
 }
