@@ -3,8 +3,10 @@ import java.util.*
 class Day11 : AbstractSolver("11", 55312, 0) {
 
     private data class Input(val case: List<Long>)
+    private data class SolvedN(val n: Long, val blinks: Int)
 
     private val SINGLETON_1 = Collections.singletonList(1L)
+    private val CACHE_SOLVE: MutableMap<SolvedN, Long> = mutableMapOf()
 
     private fun createInput(input: List<String>, printInput: Boolean = false): Input {
         check(input.size == 1)
@@ -17,14 +19,7 @@ class Day11 : AbstractSolver("11", 55312, 0) {
 
     override fun solvePart1(inputLines: List<String>): Long {
         val input = createInput(inputLines).case
-        return input.sumOf { applyRulesAndCountStones(it, 25) }
-    }
-
-    private fun applyRulesAndCountStones(n: Long, remainingBlinks: Int): Long {
-        if (remainingBlinks == 0) {
-            return 1
-        }
-        return applyRules(n).sumOf { applyRulesAndCountStones(it, remainingBlinks - 1) }
+        return input.sumOf { applyRulesAndCountStonesCached(it, 25) }
     }
 
     private fun applyRules(n: Long): List<Long> {
@@ -45,13 +40,24 @@ class Day11 : AbstractSolver("11", 55312, 0) {
     }
 
     private fun hasEvenNumberOfDigits(n: Long): Boolean {
-        return n.toString().length % 2 == 0 // may be implemented more efficient
+        return n.toString().length % 2 == 0
     }
 
     override fun solvePart2(inputLines: List<String>): Number {
         val input = createInput(inputLines).case
-        var solution: Long = input.sumOf { applyRulesAndCountStones(it, 75) }
-        return solution
+        return input.sumOf { applyRulesAndCountStonesCached(it, 75) }
     }
 
+    private fun applyRulesAndCountStonesCached(n: Long, remainingBlinks: Int): Long {
+        if (remainingBlinks == 0) {
+            return 1
+        }
+        val k = SolvedN(n = n, blinks = remainingBlinks)
+        if (CACHE_SOLVE.containsKey(k)) {
+            return CACHE_SOLVE[k]!!
+        }
+        val result = applyRules(n).sumOf { applyRulesAndCountStonesCached(it, remainingBlinks - 1) }
+        CACHE_SOLVE[k] = result
+        return result
+    }
 }
