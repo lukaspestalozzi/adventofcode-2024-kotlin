@@ -10,7 +10,7 @@ fun main() {
         logger.info("Solving $dayPartString ... ")
         val input = solver.readInput(testInput = testInput)
         val solution = function(input)
-        logger.info("Solved  $dayPartString: $solution")
+        logger.info("Solved  $dayPartString: ${solution.toLong()}")
         return solution
     }
 

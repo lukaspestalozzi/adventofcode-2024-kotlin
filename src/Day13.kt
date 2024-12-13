@@ -3,10 +3,9 @@ class Day13 : AbstractSolver("13", 480, 0) {
     companion object {
         const val COST_A = 3
         const val COST_B = 1
-        const val NO_SOLUTION = Int.MAX_VALUE
     }
 
-    private data class Pos(val x: Int, val y: Int) {
+    private data class Pos(val x: Long, val y: Long) {
         fun move(pos: Pos): Pos {
             return Pos(x + pos.x, y + pos.y)
         }
@@ -36,41 +35,53 @@ class Day13 : AbstractSolver("13", 480, 0) {
         val (ax, ay) = buttonRegex.matchEntire(lines[0])?.destructured ?: throw IllegalArgumentException(lines[0])
         val (bx, by) = buttonRegex.matchEntire(lines[1])?.destructured ?: throw IllegalArgumentException(lines[1])
         val (px, py) = prizeRegex.matchEntire(lines[2])?.destructured ?: throw IllegalArgumentException(lines[2])
-        return Case(Pos(ax.toInt(), ay.toInt()), Pos(bx.toInt(), by.toInt()), Pos(px.toInt(), py.toInt()))
+        return Case(Pos(ax.toLong(), ay.toLong()), Pos(bx.toLong(), by.toLong()), Pos(px.toLong(), py.toLong()))
     }
 
     override fun solvePart1(inputLines: List<String>): Number {
         val input = createInput(inputLines)
-        var solution: Long = 0
-        for(case in input.cases){
+        var solution: Double = 0.0
+        for (case in input.cases) {
             solution += solveCase(case)
         }
         return solution
     }
 
-    private fun solveCase(case: Case): Int {
-        val sol = solveCase(currPos = Pos(0, 0), goal = case.prize, buttonA = case.a, buttonB = case.b, cutoff = Int.MAX_VALUE)
-        logger.info { "$case -> $sol" }
-        return if(sol > NO_SOLUTION*0.9) 0 else sol
-    }
+    private fun solveCase(case: Case): Double {
+        val ax = case.a.x
+        val ay = case.a.y
+        val bx = case.b.x
+        val by = case.b.y
+        val px = case.prize.x.toDouble()
+        val py = case.prize.y.toDouble()
 
-    private fun solveCase(currPos: Pos, goal: Pos, buttonA: Pos, buttonB: Pos, cutoff: Int): Int {
-        if (goal.x < currPos.x || goal.y < currPos.y) {
-//            logger.info { "too high $currPos > $goal" }
-            return NO_SOLUTION
+        if (bx * ay != ax * by) {
+            val numA: Double = (py * bx - px * by) / (bx * ay - ax * by)
+            val numB: Double = (py * ax - px * ay) / (ax * by - bx * ay)
+            if (numA < 0 || numB < 0) {
+                logger.info { "not possible because negative" }
+                return 0.0
+            }
+            if (numA > numA.toLong() || numB > numB.toLong()) {
+                logger.info { "not possible because double" }
+                return 0.0
+            }
+            logger.info { "numA=$numA ; numB=$numB" }
+            val sol = COST_A * numA + COST_B * numB
+            return sol
+        } else {
+            throw IllegalArgumentException("$case")
         }
-        if (goal.x == currPos.x || goal.y == currPos.y) {
-            return 0
-        }
-        val takeA = COST_A + solveCase(currPos.move(buttonA), goal, buttonA, buttonB, cutoff=cutoff)
-        val takeB = COST_B + solveCase(currPos.move(buttonB), goal, buttonA, buttonB, cutoff=if(takeA < cutoff) takeA else cutoff)
-        return if(takeA < takeB) takeA else takeB
     }
 
     override fun solvePart2(inputLines: List<String>): Number {
         val input = createInput(inputLines)
-        var solution: Long = 0
+        val scale = 10000000000000
+        var solution: Double = 0.0
+        for (case in input.cases) {
+            val bigCase = Case(case.a, case.b, prize = Pos(case.prize.x+scale, case.prize.y+scale))
+            solution += solveCase(bigCase)
+        }
         return solution
     }
 }
-
