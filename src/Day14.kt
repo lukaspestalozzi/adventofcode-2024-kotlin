@@ -20,10 +20,10 @@ class Day14 : AbstractSolver("14", 12, 0) {
         fun move(vx: Int, vy: Int, bound: Bounds): Pos {
             var nextX = (x + vx) % bound.modX
             var nextY = (y + vy) % bound.modY
-            while(nextX < 0){
+            while (nextX < 0) {
                 nextX += bound.modX
             }
-            while(nextY < 0){
+            while (nextY < 0) {
                 nextY += bound.modY
             }
             return Pos(nextX, nextY)
@@ -67,7 +67,7 @@ class Day14 : AbstractSolver("14", 12, 0) {
 
     private data class Robot(val p: Pos, val vx: Int, val vy: Int) {
         fun move(b: Bounds): Robot {
-            return Robot(p.move(vx, vy, b), vx=vx, vy=vy)
+            return Robot(p.move(vx, vy, b), vx = vx, vy = vy)
         }
     }
 
@@ -107,7 +107,7 @@ class Day14 : AbstractSolver("14", 12, 0) {
         for (r in robots) {
             val qidx = r.p.getQuadrant(bound)
             if (qidx != MIDDLE) {
-                quadrants[qidx] = quadrants[qidx]+1
+                quadrants[qidx] = quadrants[qidx] + 1
             }
         }
         logger.info { "$quadrants" }
@@ -122,7 +122,7 @@ class Day14 : AbstractSolver("14", 12, 0) {
         while (sec < 1000000) {
             nextRobots = nextRobots.map { it.move(bound) }
             val robotsByPosition: Map<Pos, List<Robot>> = nextRobots.groupBy { it.p }
-            if (robotsByPosition.size == nextRobots.size){
+            if (robotsByPosition.size == nextRobots.size) {
                 break
             }
             sec++
@@ -130,5 +130,25 @@ class Day14 : AbstractSolver("14", 12, 0) {
         Grid(robots = nextRobots, bound = bound).print()
         var solution: Long = sec
         return solution
+    }
+
+    private fun solvePart2WithSafetyFactor(inputLines: List<String>): Number {
+        val input = createInput(inputLines, true)
+        val bound: Bounds = input.bound
+        var nextRobots = input.robots
+        var sec = 1L
+        var th = Long.MAX_VALUE
+        var sol = sec
+        while (sec < 9000) {
+            nextRobots = nextRobots.map { it.move(bound) }
+            if (groupByQuadrantAndCalcSafetyFactor(nextRobots, bound) < th) {
+                logger.info { "$sec" }
+                Grid(robots = nextRobots, bound = bound).print()
+                th = groupByQuadrantAndCalcSafetyFactor(nextRobots, bound)
+                sol = sec
+            }
+            sec++
+        }
+        return sol
     }
 }
