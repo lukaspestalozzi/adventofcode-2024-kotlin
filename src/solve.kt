@@ -1,5 +1,5 @@
 fun main() {
-    val solver = Day15()
+    val solver = Day15Part2()
 
     val logger = solver.logger
 
@@ -15,8 +15,15 @@ fun main() {
     }
 
     // Test Input
-    val solTest1: Number = solveAndPrint(solver, 1, testInput = true, function = solver::solvePart1)
-    check(solTest1.toLong() == solver.expectedTestPart1.toLong()) { "$solTest1 == ${solver.expectedTestPart1}" }
+    // Part 1
+    if (solver.expectedTestPart1.toLong() > 0) {
+        val solTest1: Number = solveAndPrint(solver, 1, testInput = true, function = solver::solvePart1)
+        check(solTest1.toLong() == solver.expectedTestPart1.toLong()) { "$solTest1 == ${solver.expectedTestPart1}" }
+    } else {
+        logger.info { "Skipping Test 1, solver.expectedTestPart1 = ${solver.expectedTestPart1} <= 0" }
+    }
+
+    // Part 2
     if (solver.expectedTestPart2.toLong() > 0) {
         val solTest2: Number = solveAndPrint(solver, 2, testInput = true, function = solver::solvePart2)
         check(solTest2.toLong() == solver.expectedTestPart2.toLong()) { "$solTest2 == ${solver.expectedTestPart2}" }
