@@ -1,4 +1,8 @@
 class DayGrid/*TODO add nbr*/ : AbstractSolver(TODO("add nbr as string"), 0, 0) {
+    companion object {
+        const val WALL = '#'
+    }
+
     private enum class Direction {
         UP, DOWN, LEFT, RIGHT;
 
@@ -8,6 +12,15 @@ class DayGrid/*TODO add nbr*/ : AbstractSolver(TODO("add nbr as string"), 0, 0) 
                 RIGHT -> DOWN
                 DOWN -> LEFT
                 LEFT -> UP
+            }
+        }
+
+        fun rotateLeft(): Direction {
+            return when (this) {
+                UP -> LEFT
+                RIGHT -> UP
+                DOWN -> RIGHT
+                LEFT -> DOWN
             }
         }
     }
@@ -23,7 +36,7 @@ class DayGrid/*TODO add nbr*/ : AbstractSolver(TODO("add nbr as string"), 0, 0) 
         }
     }
 
-    private data class Grid(val cells: List<List<Char>>, val outsideChar: Char = '!') {
+    private data class Grid(val cells: List<List<Char>>, val outsideChar: Char = WALL) {
         fun charAt(pos: Pos): Char {
             return try {
                 cells[pos.row][pos.col]
@@ -40,6 +53,10 @@ class DayGrid/*TODO add nbr*/ : AbstractSolver(TODO("add nbr as string"), 0, 0) 
                 }
             }
             return poses
+        }
+
+        fun findUniqueChar(c: Char): Pos {
+            return positions().first {charAt(it)==c}
         }
 
         fun print() {
@@ -78,7 +95,7 @@ class DayGrid/*TODO add nbr*/ : AbstractSolver(TODO("add nbr as string"), 0, 0) 
         var solution: Long = 0
         return solution
     }
-    
+
     override fun solvePart2(inputLines: List<String>): Number {
         val input = createInput(inputLines)
         var solution: Long = 0
