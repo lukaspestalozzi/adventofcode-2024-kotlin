@@ -1,6 +1,8 @@
-class Day17 : AbstractSolver("17", 1, 0) {
+import java.util.Collections
 
-    private data class Register(var value: Int, val name: String)
+class Day17 : AbstractSolver("17", 5730, 117440) {
+
+    private data class Register(var value: Long)
     private data class InstructionPointer(var p: Int) {
         fun jump() {
             p += 2
@@ -12,7 +14,7 @@ class Day17 : AbstractSolver("17", 1, 0) {
             return code
         }
 
-        fun comboValue(rA: Register, rB: Register, rC: Register): Int {
+        fun comboValue(rA: Register, rB: Register, rC: Register): Long {
             return when (code) {
                 0 -> 0
                 1 -> 1
@@ -51,7 +53,7 @@ class Day17 : AbstractSolver("17", 1, 0) {
             val numerator = rA.value
             val denominator: Double = Math.pow(2.0, op.comboValue(rA, rB, rC).toDouble())
             val result = truncateToInt(numerator / denominator) // TODO trucated?
-            rA.value = result
+            rA.value = result.toLong()
         }
     }
 
@@ -60,7 +62,7 @@ class Day17 : AbstractSolver("17", 1, 0) {
             val numerator = rA.value
             val denominator: Double = Math.pow(2.0, op.comboValue(rA, rB, rC).toDouble())
             val result = truncateToInt(numerator / denominator) // TODO trucated?
-            rB.value = result
+            rB.value = result.toLong()
         }
     }
 
@@ -69,13 +71,13 @@ class Day17 : AbstractSolver("17", 1, 0) {
             val numerator = rA.value
             val denominator: Double = Math.pow(2.0, op.comboValue(rA, rB, rC).toDouble())
             val result = truncateToInt(numerator / denominator) // TODO trucated?
-            rC.value = result
+            rC.value = result.toLong()
         }
     }
 
     private class I1() : Instruction() {
         override fun exec(op: Operand, rA: Register, rB: Register, rC: Register, p: InstructionPointer) {
-            val result = rB.value xor op.literalValue()
+            val result = rB.value xor op.literalValue().toLong()
             rB.value = result
         }
     }
@@ -96,7 +98,7 @@ class Day17 : AbstractSolver("17", 1, 0) {
 
     private class I3() : Instruction() {
         override fun exec(op: Operand, rA: Register, rB: Register, rC: Register, p: InstructionPointer) {
-            if (rA.value != 0) {
+            if (rA.value != 0L) {
                 p.p = op.literalValue()
             }
         }
@@ -106,13 +108,15 @@ class Day17 : AbstractSolver("17", 1, 0) {
         private val out = mutableListOf<Int>()
         override fun exec(op: Operand, rA: Register, rB: Register, rC: Register, p: InstructionPointer) {
             val result = op.comboValue(rA, rB, rC) % 8
-            out.add(result)
+            out.add(result.toInt())
         }
 
-        fun joinOutAndClear(): String {
-            val s = out.joinToString(",")
+        fun out(): List<Int> {
+            return out
+        }
+
+        fun clear() {
             out.clear()
-            return s
         }
     }
 
@@ -120,24 +124,62 @@ class Day17 : AbstractSolver("17", 1, 0) {
     private data class Input(val program: List<Int>, val rA: Register, val rB: Register, val rC: Register)
 
     private fun createInput(input: List<String>, printInput: Boolean = false): Input {
-        val inputRegisterA: Int = input[0].split(": ")[1].toInt()
-        val inputRegisterB: Int = input[1].split(": ")[1].toInt()
-        val inputRegisterC: Int = input[2].split(": ")[1].toInt()
+        val inputRegisterA: Long = input[0].split(": ")[1].toLong()
+        val inputRegisterB: Long = input[1].split(": ")[1].toLong()
+        val inputRegisterC: Long = input[2].split(": ")[1].toLong()
         val inputProgram: List<Int> = input[4].split("Program: ")[1].split(",").map { it.toInt() }
 
 
         val createdInput = Input(
             program = inputProgram,
-            rA = Register(inputRegisterA, "A"),
-            rB = Register(inputRegisterB, "B"),
-            rC = Register(inputRegisterC, "C")
+            rA = Register(inputRegisterA),
+            rB = Register(inputRegisterB),
+            rC = Register(inputRegisterC)
         )
         if (printInput) logger.debug("{}", createdInput)
         return createdInput
     }
 
     override fun solvePart1(inputLines: List<String>): Number {
-        val input = createInput(inputLines, true)
+        val input = createInput(inputLines)
+        val result = runProgram(input)
+        println("result=$result")
+        var solution: Long = result.joinToString("").toLong()
+        return solution
+    }
+
+    override fun solvePart2(inputLines: List<String>): Number {
+        val input = createInput(inputLines)
+        val valA = input.rA.value
+        val valB = input.rB.value
+        val valC = input.rC.value
+        val target = input.program
+        var tryA = -1L
+        var result = Collections.emptyList<Int>()
+        logger.info { "target=$target" }
+        while (result != target) {
+            // reset
+            input.rA.value = ++tryA
+            input.rB.value = valB
+            input.rC.value = valC
+            iOut.clear()
+            // progress
+            if(tryA%1000000 == 0L){
+                println(tryA)
+            }
+            if(tryA < 0){
+                return -1
+            }
+            // run
+            result = runProgramPart2(input, target)
+//            logger.info { "result=$result" }
+        }
+        var solution: Long = tryA.toLong()
+        return solution
+    }
+
+    private fun runProgramPart2(input: Input, target: List<Int>): List<Int> {
+        var targetIdx = 0
         val program = input.program
         val rA = input.rA
         val rB = input.rB
@@ -145,31 +187,43 @@ class Day17 : AbstractSolver("17", 1, 0) {
         val pointer = InstructionPointer(0)
         while (pointer.p < program.size - 1) {
             val pointerBefore = pointer.p
-            logger.info { "$pointer" }
             val instructionIdx = program[pointer.p]
-            val opIdx = program[pointer.p+1]
+            val opIdx = program[pointer.p + 1]
             val instruction = instructions[instructionIdx]
             val op = operands[opIdx]
-            logger.info { "$instructionIdx -> $instruction with $opIdx -> $op" }
             instruction.exec(op, rA, rB, rC, pointer)
             if (pointerBefore == pointer.p) {
                 pointer.jump()
-                logger.info { "jump -> $pointer" }
-            }else{
-                logger.info { "no jump -> $pointer" }
+            }
+            // check and early exit
+            if(iOut.out().size > targetIdx){
+                if(iOut.out().last() != target[targetIdx]){
+                    return iOut.out()
+                }
+                targetIdx++
             }
         }
-        logger.info { "halt: $pointer" }
-        println("result=${ iOut.joinOutAndClear()}")
-
-        var solution: Long = 1
-        return solution
+        return iOut.out()
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
-        val input = createInput(inputLines)
-        var solution: Long = 0
-        return solution
+    private fun runProgram(input: Input): List<Int> {
+        val program = input.program
+        val rA = input.rA
+        val rB = input.rB
+        val rC = input.rC
+        val pointer = InstructionPointer(0)
+        while (pointer.p < program.size - 1) {
+            val pointerBefore = pointer.p
+            val instructionIdx = program[pointer.p]
+            val opIdx = program[pointer.p + 1]
+            val instruction = instructions[instructionIdx]
+            val op = operands[opIdx]
+            instruction.exec(op, rA, rB, rC, pointer)
+            if (pointerBefore == pointer.p) {
+                pointer.jump()
+            }
+        }
+        return iOut.out()
     }
 }
 
