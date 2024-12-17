@@ -1,6 +1,6 @@
-import java.util.Collections
+import java.lang.Math.pow
 
-class Day17 : AbstractSolver("17", 5730, 117440) {
+class Day17 : AbstractSolver("17", 5730, 0) {
 
     private data class Register(var value: Long)
     private data class InstructionPointer(var p: Int) {
@@ -39,8 +39,8 @@ class Day17 : AbstractSolver("17", 5730, 117440) {
 
     private abstract class Instruction {
         abstract fun exec(op: Operand, rA: Register, rB: Register, rC: Register, p: InstructionPointer)
-        fun truncateToInt(n: Number): Int {
-            return n.toInt()
+        fun truncate(n: Number): Long {
+            return n.toLong()
         }
 
         override fun toString(): String {
@@ -52,8 +52,8 @@ class Day17 : AbstractSolver("17", 5730, 117440) {
         override fun exec(op: Operand, rA: Register, rB: Register, rC: Register, p: InstructionPointer) {
             val numerator = rA.value
             val denominator: Double = Math.pow(2.0, op.comboValue(rA, rB, rC).toDouble())
-            val result = truncateToInt(numerator / denominator) // TODO trucated?
-            rA.value = result.toLong()
+            val result = truncate(numerator / denominator)
+            rA.value = result
         }
     }
 
@@ -61,8 +61,8 @@ class Day17 : AbstractSolver("17", 5730, 117440) {
         override fun exec(op: Operand, rA: Register, rB: Register, rC: Register, p: InstructionPointer) {
             val numerator = rA.value
             val denominator: Double = Math.pow(2.0, op.comboValue(rA, rB, rC).toDouble())
-            val result = truncateToInt(numerator / denominator) // TODO trucated?
-            rB.value = result.toLong()
+            val result = truncate(numerator / denominator)
+            rB.value = result
         }
     }
 
@@ -70,8 +70,8 @@ class Day17 : AbstractSolver("17", 5730, 117440) {
         override fun exec(op: Operand, rA: Register, rB: Register, rC: Register, p: InstructionPointer) {
             val numerator = rA.value
             val denominator: Double = Math.pow(2.0, op.comboValue(rA, rB, rC).toDouble())
-            val result = truncateToInt(numerator / denominator) // TODO trucated?
-            rC.value = result.toLong()
+            val result = truncate(numerator / denominator)
+            rC.value = result
         }
     }
 
@@ -142,73 +142,45 @@ class Day17 : AbstractSolver("17", 5730, 117440) {
 
     override fun solvePart1(inputLines: List<String>): Number {
         val input = createInput(inputLines)
-        val result = runProgram(input)
+        val result = runProgram(input, valA = input.rA.value)
         println("result=$result")
         var solution: Long = result.joinToString("").toLong()
         return solution
     }
 
+    private fun find(input: Input, valB: Long, valC: Long, a: Long, idx: Int): Long {
+        val candidates = mutableListOf<Long>(Long.MAX_VALUE)
+        if (idx < 0) {
+            return a
+        }
+        for (i in 0..<8) {
+            val tryA: Long = a + i * pow(8.0, idx.toDouble()).toLong()
+            val result = runProgram(input, tryA)
+            if (result.size < input.program.size) {
+                continue
+            }
+            if (result[idx] == input.program[idx]) {
+                val candidate = find(input, valB, valC, tryA, idx - 1)
+                candidates.add(candidate)
+            }
+        }
+        return candidates.min()
+    }
+
     override fun solvePart2(inputLines: List<String>): Number {
         val input = createInput(inputLines)
-        val valA = input.rA.value
         val valB = input.rB.value
         val valC = input.rC.value
         val target = input.program
-        var tryA = -1L
-        var result = Collections.emptyList<Int>()
-        logger.info { "target=$target" }
-        while (result != target) {
-            // reset
-            input.rA.value = ++tryA
-            input.rB.value = valB
-            input.rC.value = valC
-            iOut.clear()
-            // progress
-            if(tryA%1000000 == 0L){
-                println(tryA)
-            }
-            if(tryA < 0){
-                return -1
-            }
-            // run
-            result = runProgramPart2(input, target)
-//            logger.info { "result=$result" }
-        }
-        var solution: Long = tryA.toLong()
-        return solution
+        val num = find(input, valB, valC, 0, target.size - 1)
+        return num
     }
 
-    private fun runProgramPart2(input: Input, target: List<Int>): List<Int> {
-        var targetIdx = 0
+    private fun runProgram(input: Input, valA: Long): List<Int> {
         val program = input.program
+        iOut.clear()
         val rA = input.rA
-        val rB = input.rB
-        val rC = input.rC
-        val pointer = InstructionPointer(0)
-        while (pointer.p < program.size - 1) {
-            val pointerBefore = pointer.p
-            val instructionIdx = program[pointer.p]
-            val opIdx = program[pointer.p + 1]
-            val instruction = instructions[instructionIdx]
-            val op = operands[opIdx]
-            instruction.exec(op, rA, rB, rC, pointer)
-            if (pointerBefore == pointer.p) {
-                pointer.jump()
-            }
-            // check and early exit
-            if(iOut.out().size > targetIdx){
-                if(iOut.out().last() != target[targetIdx]){
-                    return iOut.out()
-                }
-                targetIdx++
-            }
-        }
-        return iOut.out()
-    }
-
-    private fun runProgram(input: Input): List<Int> {
-        val program = input.program
-        val rA = input.rA
+        rA.value = valA
         val rB = input.rB
         val rC = input.rC
         val pointer = InstructionPointer(0)
