@@ -1,9 +1,5 @@
-import com.sun.org.slf4j.internal.LoggerFactory
-import java.lang.invoke.MethodHandles
 import java.math.BigInteger
 import java.security.MessageDigest
-import kotlin.io.path.Path
-import kotlin.io.path.readText
 import kotlin.math.abs
 
 /**

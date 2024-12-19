@@ -1,6 +1,3 @@
-import kotlin.math.abs
-import kotlin.math.round
-
 class Day14 : AbstractSolver("14", "12", "0") {
 
     companion object {
