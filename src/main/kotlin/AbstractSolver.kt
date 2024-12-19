@@ -14,6 +14,6 @@ abstract class AbstractSolver(val dayNr: String, val expectedTestPart1: String, 
      * Reads lines from the given input txt file.
      */
     fun readInput(testInput: Boolean) =
-        Path("src/main/Day${dayNr}${if (testInput) "_test" else ""}.txt").readText().trim().lines()
+        Path("src/main/kotlin/Day${dayNr}${if (testInput) "_test" else ""}.txt").readText().trim().lines()
 
 }
