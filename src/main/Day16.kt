@@ -1,19 +1,8 @@
-import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
-import com.mxgraph.layout.mxIGraphLayout
-import com.mxgraph.util.mxCellRenderer
 import org.jgrapht.Graph
 import org.jgrapht.GraphPath
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath
 import org.jgrapht.alg.shortestpath.YenKShortestPath
-import org.jgrapht.ext.JGraphXAdapter
 import org.jgrapht.graph.SimpleWeightedGraph
-import java.awt.Color
-import java.io.File
-import java.io.FileWriter
-import javax.xml.transform.Transformer
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
 
 
 class Day16 : AbstractSolver("16", "7036", "45") {
@@ -228,22 +217,6 @@ class Day16 : AbstractSolver("16", "7036", "45") {
         var solution: Long = positions.size.toLong()
 
         return solution.toString()
-    }
-
-    private fun viz(g: Graph<Node, Edge>) {
-        val graphAdapter = JGraphXAdapter<Node, Edge>(g)
-        val layout: mxIGraphLayout = mxHierarchicalLayout(graphAdapter)
-        layout.execute(graphAdapter.defaultParent)
-
-        val document =
-            mxCellRenderer.createSvgDocument(graphAdapter, null, 1.0, Color.WHITE, null)
-
-        val transformer: Transformer = TransformerFactory.newInstance().newTransformer()
-        val source = DOMSource(document)
-        val writer: FileWriter =
-            FileWriter(File("/home/lu/gitrepos/adventofcode/adventofcode-2024-kotlin/tmp/graph.svg"))
-        val result = StreamResult(writer)
-        transformer.transform(source, result);
     }
 }
 
