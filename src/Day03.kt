@@ -1,4 +1,4 @@
-class Day03 : AbstractSolver("03", 161, 48) {
+class Day03 : AbstractSolver("03", "161", "48") {
 
     private data class Input(val case: String)
 
@@ -6,16 +6,16 @@ class Day03 : AbstractSolver("03", 161, 48) {
         return Input(input.joinToString(""))
     }
 
-    override fun solvePart1(inputLines: List<String>): Int {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines)
         val solution = sumMul(input.case)
-        return solution
+        return solution.toString()
     }
 
     /**
      * Find the starting indexes of all "do()" and "don't" substrings. Then use the solution for part1 only on the "do()" substrings.
      */
-    override fun solvePart2(inputLines: List<String>): Int {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines)
         var solution = 0
         val DO = "do()"
@@ -30,7 +30,7 @@ class Day03 : AbstractSolver("03", 161, 48) {
                 solution += sumMul(subs)
             }
         }
-        return solution
+        return solution.toString()
     }
 
     private fun sumMul(s: String): Int {

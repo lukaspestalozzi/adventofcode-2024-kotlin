@@ -1,4 +1,4 @@
-class Day13 : AbstractSolver("13", 480, 0) {
+class Day13 : AbstractSolver("13", "480", "0") {
 
     companion object {
         const val COST_A = 3
@@ -38,13 +38,13 @@ class Day13 : AbstractSolver("13", 480, 0) {
         return Case(Pos(ax.toLong(), ay.toLong()), Pos(bx.toLong(), by.toLong()), Pos(px.toLong(), py.toLong()))
     }
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines)
         var solution: Double = 0.0
         for (case in input.cases) {
             solution += solveCase(case)
         }
-        return solution
+        return solution.toString()
     }
 
     private fun solveCase(case: Case): Double {
@@ -74,7 +74,7 @@ class Day13 : AbstractSolver("13", 480, 0) {
         }
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines)
         val scale = 10000000000000
         var solution: Double = 0.0
@@ -82,6 +82,6 @@ class Day13 : AbstractSolver("13", 480, 0) {
             val bigCase = Case(case.a, case.b, prize = Pos(case.prize.x+scale, case.prize.y+scale))
             solution += solveCase(bigCase)
         }
-        return solution
+        return solution.toString()
     }
 }

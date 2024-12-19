@@ -1,4 +1,4 @@
-class Day07 : AbstractSolver("07", 3749, 11387) {
+class Day07 : AbstractSolver("07", "3749", "11387") {
 
     private data class Case(val result: Long, val list: List<Long>)
     private data class Input(val cases: List<Case>)
@@ -16,13 +16,13 @@ class Day07 : AbstractSolver("07", 3749, 11387) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines)
         var solution: Long = 0
         for (case in input.cases) {
             solution += solve1(case.result, 0, currIdx = 0, remaining = case.list)
         }
-        return solution
+        return solution.toString()
     }
 
     private fun solve1(expectedResult: Long, acc: Long, currIdx: Int, remaining: List<Long>): Long {
@@ -42,13 +42,13 @@ class Day07 : AbstractSolver("07", 3749, 11387) {
     }
 
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines)
         var solution: Long = 0
         for (case in input.cases) {
             solution += solve2(case.result, 0, currIdx = 0, remaining = case.list)
         }
-        return solution
+        return solution.toString()
     }
 
     private fun solve2(expectedResult: Long, acc: Long, currIdx: Int, remaining: List<Long>): Long {

@@ -1,6 +1,6 @@
 import java.lang.Math.pow
 
-class Day17 : AbstractSolver("17", 5730, 0) {
+class Day17 : AbstractSolver("17", "5730", "0") {
 
     private data class Register(var value: Long)
     private data class InstructionPointer(var p: Int) {
@@ -140,12 +140,12 @@ class Day17 : AbstractSolver("17", 5730, 0) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines)
         val result = runProgram(input, valA = input.rA.value)
         println("result=$result")
         var solution: Long = result.joinToString("").toLong()
-        return solution
+        return solution.toString()
     }
 
     private fun find(input: Input, valB: Long, valC: Long, a: Long, idx: Int): Long {
@@ -167,13 +167,13 @@ class Day17 : AbstractSolver("17", 5730, 0) {
         return candidates.min()
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines)
         val valB = input.rB.value
         val valC = input.rC.value
         val target = input.program
         val num = find(input, valB, valC, 0, target.size - 1)
-        return num
+        return num.toString()
     }
 
     private fun runProgram(input: Input, valA: Long): List<Int> {

@@ -1,4 +1,4 @@
-class Day06 : AbstractSolver("06", 41, 6) {
+class Day06 : AbstractSolver("06", "41", "6") {
 
     companion object {
         const val OBSTACLE = '#'
@@ -87,11 +87,11 @@ class Day06 : AbstractSolver("06", 41, 6) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Int {
+    override fun solvePart1(inputLines: List<String>): String {
         val grid = createInput(inputLines).grid
         val path = determinePath(grid)
         val solution = path.toSet().count()
-        return solution
+        return solution.toString()
     }
 
     private fun determinePath(grid: Grid): List<Pos> {
@@ -118,7 +118,7 @@ class Day06 : AbstractSolver("06", 41, 6) {
         return path
     }
 
-    override fun solvePart2(inputLines: List<String>): Int {
+    override fun solvePart2(inputLines: List<String>): String {
         val grid = createInput(inputLines).grid
         val path = determinePath(grid)
         val solution = mutableSetOf<Pos>()
@@ -133,8 +133,7 @@ class Day06 : AbstractSolver("06", 41, 6) {
             }
         }
 
-        return solution.count()
+        return solution.count().toString()
     }
-
 }
 

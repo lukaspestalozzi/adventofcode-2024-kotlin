@@ -1,6 +1,6 @@
 import java.util.*
 
-class Day10 : AbstractSolver("10", 36, 81) {
+class Day10 : AbstractSolver("10", "36", "81") {
     private enum class Direction {
         UP, DOWN, LEFT, RIGHT;
     }
@@ -66,14 +66,14 @@ class Day10 : AbstractSolver("10", 36, 81) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         val grid = createInput(inputLines).grid
         var solution = 0
         for (pos in grid.positions()) {
             val trailends = collectTrailends(grid, pos, -1)
             solution += trailends.size
         }
-        return solution
+        return solution.toString()
     }
 
     private fun collectTrailends(grid: Grid, currPos: Pos, lastHeight: Int): Set<Pos> {
@@ -90,13 +90,13 @@ class Day10 : AbstractSolver("10", 36, 81) {
         return concat
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val grid = createInput(inputLines).grid
         var solution = 0
         for (pos in grid.positions()) {
             solution += countTrails(grid, pos, -1)
         }
-        return solution
+        return solution.toString()
     }
 
     private fun countTrails(grid: Grid, currPos: Pos, lastHeight: Int): Int {

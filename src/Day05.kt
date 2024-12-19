@@ -1,6 +1,6 @@
 import kotlin.math.floor
 
-class Day05 : AbstractSolver("05", 143, 123) {
+class Day05 : AbstractSolver("05", "143", "123") {
 
     private data class Case(val list: List<Int>)
     private data class Rule(val first: Int, val second: Int)
@@ -31,7 +31,7 @@ class Day05 : AbstractSolver("05", 143, 123) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Int {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines)
         val invertedRules: List<Rule> = input.rules.map { Rule(it.second, it.first) } // first must be after second
         val rulesBackwards: Map<Int, Set<Int>> = toMultimap(invertedRules, Rule::second, Rule::first) // key must be before values
@@ -42,7 +42,7 @@ class Day05 : AbstractSolver("05", 143, 123) {
             }
         }
         val solution = validCases.sumOf { c -> findMiddleNumber(c.list) }
-        return solution
+        return solution.toString()
     }
 
     /**
@@ -61,7 +61,7 @@ class Day05 : AbstractSolver("05", 143, 123) {
         return true
     }
 
-    override fun solvePart2(inputLines: List<String>): Int {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines)
         val invertedRules: List<Rule> = input.rules.map { Rule(it.second, it.first) } // first must be after second
         val rulesBackwards: Map<Int, Set<Int>> = toMultimap(invertedRules, Rule::second, Rule::first) // key must be before values
@@ -81,7 +81,7 @@ class Day05 : AbstractSolver("05", 143, 123) {
             }
         }
         val solution = correctedCases.sumOf { c -> findMiddleNumber(c.list) }
-        return solution
+        return solution.toString()
     }
 
     /**

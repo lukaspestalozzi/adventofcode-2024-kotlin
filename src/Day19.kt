@@ -1,4 +1,4 @@
-class Day19 : AbstractSolver("19", 6, 16) {
+class Day19 : AbstractSolver("19", "6", "16") {
 
     private data class Case(val pattern: String)
     private data class Input(val cases: List<Case>, val availablePatterns: List<String>)
@@ -26,7 +26,7 @@ class Day19 : AbstractSolver("19", 6, 16) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         CACHE_PART1.clear()
         CACHE_PART2.clear()
         val input = createInput(inputLines, true)
@@ -37,7 +37,7 @@ class Day19 : AbstractSolver("19", 6, 16) {
                 solution++
             }
         }
-        return solution
+        return solution.toString()
     }
 
     private fun isPatternPossible(pattern: String, idx: Int, availablePatterns: List<String>): Boolean {
@@ -61,7 +61,7 @@ class Day19 : AbstractSolver("19", 6, 16) {
         return false
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         CACHE_PART1.clear()
         CACHE_PART2.clear()
         val input = createInput(inputLines, true)
@@ -77,7 +77,7 @@ class Day19 : AbstractSolver("19", 6, 16) {
             logger.info { "${case.pattern} -> $possibilities" }
             solution += possibilities
         }
-        return solution
+        return solution.toString()
     }
 
     private fun countPossibleSolutions(pattern: String, idx: Int, availablePatterns: List<String>): Long {

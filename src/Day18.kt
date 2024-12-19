@@ -2,7 +2,7 @@ import org.jgrapht.Graph
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath
 import org.jgrapht.graph.SimpleWeightedGraph
 
-class Day18 : AbstractSolver("18", 22, 7) {
+class Day18 : AbstractSolver("18", "22", "6,1") {
     companion object {
         const val WALL = '#'
     }
@@ -75,7 +75,7 @@ class Day18 : AbstractSolver("18", 22, 7) {
         return poses
     }
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines)
         val graph = createGraph(input)
         val take = if (input.dim < 10) 12 else 1024
@@ -89,7 +89,7 @@ class Day18 : AbstractSolver("18", 22, 7) {
         print(graph, dim = input.dim)
 
         var solution: Long = path.weight.toLong()
-        return solution
+        return solution.toString()
     }
 
     private fun createGraph(input: Input): Graph<Pos, Edge> {
@@ -108,7 +108,7 @@ class Day18 : AbstractSolver("18", 22, 7) {
         return graph
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines)
         val graph = createGraph(input)
         val take = if (input.dim < 10) 12 else 1024
@@ -126,13 +126,12 @@ class Day18 : AbstractSolver("18", 22, 7) {
             if (pathSet.contains(bit.pos)) {
                 path = DijkstraShortestPath(graph).getPath(startNode, endNode)
                 if (path == null) {
-                    println(bit.pos)
-                    return bit.pos.x + bit.pos.y
+                    return "${bit.pos.x},${bit.pos.y}"
                 }
                 pathSet = path.vertexList.toSet()
             }
         }
-        return -1
+        return ""
     }
 }
 

@@ -2,13 +2,13 @@ import mu.KotlinLogging
 import kotlin.io.path.Path
 import kotlin.io.path.readText
 
-abstract class AbstractSolver(val dayNr: String, val expectedTestPart1: Number, val expectedTestPart2: Number) {
+abstract class AbstractSolver(val dayNr: String, val expectedTestPart1: String, val expectedTestPart2: String) {
 
     val logger = KotlinLogging.logger {}
 
-    abstract fun solvePart1(inputLines: List<String>): Number
+    abstract fun solvePart1(inputLines: List<String>): String
 
-    abstract fun solvePart2(inputLines: List<String>): Number
+    abstract fun solvePart2(inputLines: List<String>): String
 
     /**
      * Reads lines from the given input txt file.

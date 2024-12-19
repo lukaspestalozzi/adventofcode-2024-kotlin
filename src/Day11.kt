@@ -1,6 +1,6 @@
 import java.util.*
 
-class Day11 : AbstractSolver("11", 55312, 0) {
+class Day11 : AbstractSolver("11", "55312", "0") {
 
     private data class Input(val case: List<Long>)
     private data class SolvedN(val n: Long, val blinks: Int)
@@ -17,9 +17,9 @@ class Day11 : AbstractSolver("11", 55312, 0) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Long {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines).case
-        return input.sumOf { applyRulesAndCountStonesCached(it, 25) }
+        return input.sumOf { applyRulesAndCountStonesCached(it, 25) }.toString()
     }
 
     private fun applyRules(n: Long): List<Long> {
@@ -43,9 +43,9 @@ class Day11 : AbstractSolver("11", 55312, 0) {
         return n.toString().length % 2 == 0
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines).case
-        return input.sumOf { applyRulesAndCountStonesCached(it, 75) }
+        return input.sumOf { applyRulesAndCountStonesCached(it, 75) }.toString()
     }
 
     private fun applyRulesAndCountStonesCached(n: Long, remainingBlinks: Int): Long {

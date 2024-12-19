@@ -1,7 +1,7 @@
 import kotlin.math.abs
 import kotlin.math.round
 
-class Day14 : AbstractSolver("14", 12, 0) {
+class Day14 : AbstractSolver("14", "12", "0") {
 
     companion object {
         const val Q1 = 0
@@ -90,7 +90,7 @@ class Day14 : AbstractSolver("14", 12, 0) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines, true)
         val bound: Bounds = input.bound
         var nextRobots = input.robots
@@ -99,7 +99,7 @@ class Day14 : AbstractSolver("14", 12, 0) {
         }
 //        Grid(robots = nextRobots, bound = bound).print()
         var solution: Long = groupByQuadrantAndCalcSafetyFactor(nextRobots, bound)
-        return solution
+        return solution.toString()
     }
 
     private fun groupByQuadrantAndCalcSafetyFactor(robots: List<Robot>, bound: Bounds): Long {
@@ -114,7 +114,7 @@ class Day14 : AbstractSolver("14", 12, 0) {
         return quadrants.reduce { a, b -> a * b }.toLong()
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines, true)
         val bound: Bounds = input.bound
         var nextRobots = input.robots
@@ -129,7 +129,7 @@ class Day14 : AbstractSolver("14", 12, 0) {
         }
         Grid(robots = nextRobots, bound = bound).print()
         var solution: Long = sec
-        return solution
+        return solution.toString()
     }
 
     private fun solvePart2WithSafetyFactor(inputLines: List<String>): Number {

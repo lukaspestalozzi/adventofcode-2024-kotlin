@@ -1,4 +1,4 @@
-class Day04 : AbstractSolver("04", 18, 9) {
+class Day04 : AbstractSolver("04", "18", "9") {
 
     private data class Pos(val row: Int, val col: Int) {
         fun move(direction: Direction): Pos {
@@ -54,14 +54,14 @@ class Day04 : AbstractSolver("04", 18, 9) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Int {
+    override fun solvePart1(inputLines: List<String>): String {
         val grid = createInput(inputLines).grid
         var solution = 0
         for (pos in grid.positions()) {
             solution += countXMAS(grid, pos)
         }
 
-        return solution
+        return solution.toString()
     }
 
     private fun countXMAS(grid: Grid, pos: Pos): Int {
@@ -83,14 +83,14 @@ class Day04 : AbstractSolver("04", 18, 9) {
         return countString(grid, nextPos, expectedString, currIdx + 1, direction)
     }
 
-    override fun solvePart2(inputLines: List<String>): Int {
+    override fun solvePart2(inputLines: List<String>): String {
         val grid = createInput(inputLines).grid
         var solution = 0
         for (pos in grid.positions()) {
             solution += countX_MAS(grid, pos)
         }
 
-        return solution
+        return solution.toString()
     }
 
     private fun countX_MAS(grid: Grid, pos: Pos): Int {

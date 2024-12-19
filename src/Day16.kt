@@ -17,7 +17,7 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
 
-class Day16 : AbstractSolver("16", 7036, 45) {
+class Day16 : AbstractSolver("16", "7036", "45") {
     companion object {
         const val WALL = '#'
     }
@@ -117,7 +117,7 @@ class Day16 : AbstractSolver("16", 7036, 45) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines, true)
         val graph = createGraph(input)
         // logger.info { "$graph" }
@@ -136,7 +136,7 @@ class Day16 : AbstractSolver("16", 7036, 45) {
         }
 
         var solution: Long = min.toLong()
-        return solution
+        return solution.toString()
     }
 
     private fun createGraph(input: Input): Graph<Node, Edge> {
@@ -196,7 +196,7 @@ class Day16 : AbstractSolver("16", 7036, 45) {
         return moveV
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines, true)
         val graph = createGraph(input)
         // logger.info { "$graph" }
@@ -228,7 +228,7 @@ class Day16 : AbstractSolver("16", 7036, 45) {
 
         var solution: Long = positions.size.toLong()
 
-        return solution
+        return solution.toString()
     }
 
     private fun viz(g: Graph<Node, Edge>) {

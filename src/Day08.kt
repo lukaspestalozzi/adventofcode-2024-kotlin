@@ -1,4 +1,4 @@
-class Day08 : AbstractSolver("08", 14, 34) {
+class Day08 : AbstractSolver("08", "14", "34") {
     private data class Pos(val row: Int, val col: Int)
     private data class Grid(val cells: List<List<Char>>) {
         fun charAt(pos: Pos): Char {
@@ -105,7 +105,7 @@ class Day08 : AbstractSolver("08", 14, 34) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines)
         val antennas = input.antennas
         val antinodes: MutableSet<Antinode> = mutableSetOf()
@@ -120,10 +120,10 @@ class Day08 : AbstractSolver("08", 14, 34) {
             0 <= it.row && it.row <= input.maxRow //
                     && 0 <= it.col && it.col <= input.maxCol
         }
-        return inGrid.toSet().count()
+        return inGrid.toSet().count().toString()
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines)
         val antennas = input.antennas
         val antinodes: MutableSet<Antinode> = mutableSetOf()
@@ -138,7 +138,7 @@ class Day08 : AbstractSolver("08", 14, 34) {
             0 <= it.row && it.row <= input.maxRow //
                     && 0 <= it.col && it.col <= input.maxCol
         }
-        return inGrid.toSet().count()
+        return inGrid.toSet().count().toString()
     }
 }
 

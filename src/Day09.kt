@@ -1,4 +1,4 @@
-class Day09 : AbstractSolver("09", 1928, 2858) {
+class Day09 : AbstractSolver("09", "1928", "2858") {
 
     private data class Input(val memory: List<Any>)
     private data class Page(val id: Int, val size: Int) {
@@ -30,7 +30,7 @@ class Day09 : AbstractSolver("09", 1928, 2858) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines, printInput = true)
         val memory: MutableList<Any> = input.memory.toMutableList()
         val resultList = mutableListOf<Page>()
@@ -84,7 +84,7 @@ class Day09 : AbstractSolver("09", 1928, 2858) {
 
         logger.info { "result=${resultList}" }
         val solution = calculateChecksum(resultList)
-        return solution
+        return solution.toString()
         // 6398872404185 too high
         // 6398608069280 correct
     }
@@ -107,13 +107,13 @@ class Day09 : AbstractSolver("09", 1928, 2858) {
         return checksum
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines, printInput = false)
         val memory: MutableList<Any> = input.memory.toMutableList()
 
 
         var solution: Long = 2858
-        return solution
+        return solution.toString()
     }
 }
 

@@ -1,4 +1,4 @@
-class DayCases/*TODO add nbr*/ : AbstractSolver(TODO("add nbr as string"), 0, 0) {
+class DayCases/*TODO add nbr*/ : AbstractSolver(TODO("add nbr as string"), "", "") {
 
     private data class Case(val result: Long, val list: List<Long>)
     private data class Input(val cases: List<Case>)
@@ -16,16 +16,16 @@ class DayCases/*TODO add nbr*/ : AbstractSolver(TODO("add nbr as string"), 0, 0)
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines)
         var solution: Long = 0
-        return solution
+        return solution.toString()
     }
     
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines)
         var solution: Long = 0
-        return solution
+        return solution.toString()
     }
 }
 

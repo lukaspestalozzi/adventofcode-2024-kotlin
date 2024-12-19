@@ -1,7 +1,7 @@
 import java.util.*
 import me.tongfei.progressbar.*;
 
-class Day12 : AbstractSolver("12", 1184, 368) {
+class Day12 : AbstractSolver("12", "1184", "368") {
     private enum class Direction {
         UP, DOWN, LEFT, RIGHT;
 
@@ -84,7 +84,7 @@ class Day12 : AbstractSolver("12", 1184, 368) {
 
     private val NULL_REGION = Region(plots = Collections.emptySet(), plant = '!')
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines, printInput = true)
         var solution: Long = 0
         for (region in ProgressBar.wrap(collectRegions(grid = input.grid), "calculate regions")) {
@@ -92,7 +92,7 @@ class Day12 : AbstractSolver("12", 1184, 368) {
             val perimeter = calcPerimeter(region)
             solution += area * perimeter
         }
-        return solution
+        return solution.toString()
     }
 
     private fun collectRegions(grid: Grid): List<Region> {
@@ -144,7 +144,7 @@ class Day12 : AbstractSolver("12", 1184, 368) {
         return perimeter
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines, printInput = true)
         var solution: Long = 0
         for (region in ProgressBar.wrap(collectRegions(grid = input.grid), "calculate regions")) {
@@ -152,7 +152,7 @@ class Day12 : AbstractSolver("12", 1184, 368) {
             val sides = calcSides(region)
             solution += area * sides
         }
-        return solution
+        return solution.toString()
     }
 
     private fun calcSides(region: Region): Long {

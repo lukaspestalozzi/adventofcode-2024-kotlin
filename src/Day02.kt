@@ -1,6 +1,6 @@
 import kotlin.math.abs
 
-class Day02 : AbstractSolver("02", 2, 4) {
+class Day02 : AbstractSolver("02", "2", "4") {
 
     private data class Case(val list: List<Int>)
     private data class Input(val cases: List<Case>)
@@ -16,7 +16,7 @@ class Day02 : AbstractSolver("02", 2, 4) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Int {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines)
         var solution = 0
         for (case in input.cases) {
@@ -25,7 +25,7 @@ class Day02 : AbstractSolver("02", 2, 4) {
             }
         }
 
-        return solution
+        return solution.toString()
     }
 
     private fun isSafePart1(case: Case): Boolean {
@@ -40,7 +40,7 @@ class Day02 : AbstractSolver("02", 2, 4) {
         return true
     }
 
-    override fun solvePart2(inputLines: List<String>): Int {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines)
         var solution = 0
         for (case in input.cases) {
@@ -51,7 +51,7 @@ class Day02 : AbstractSolver("02", 2, 4) {
             }
         }
 
-        return solution
+        return solution.toString()
     }
 
     private fun isSafePart2(

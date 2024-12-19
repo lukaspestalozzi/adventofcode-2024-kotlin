@@ -1,4 +1,4 @@
-class Day15 : AbstractSolver("15", 10092, 0) {
+class Day15 : AbstractSolver("15", "10092", "0") {
 
 
     companion object {
@@ -125,14 +125,14 @@ class Day15 : AbstractSolver("15", 10092, 0) {
         return createdInput
     }
 
-    override fun solvePart1(inputLines: List<String>): Number {
+    override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines, true)
         val grid = input.grid
         for (move in input.moves) {
             moveRobot(grid, direction = move)
         }
         var solution: Long = sumGPS(grid)
-        return solution
+        return solution.toString()
     }
 
     private fun moveRobot(grid: Grid, direction: Direction) {
@@ -169,10 +169,10 @@ class Day15 : AbstractSolver("15", 10092, 0) {
         return grid.positions().filter { grid.charAt(it) == BOX }.sumOf { 100 * it.row + it.col }.toLong()
     }
 
-    override fun solvePart2(inputLines: List<String>): Number {
+    override fun solvePart2(inputLines: List<String>): String {
         val input = createInput(inputLines)
         var solution: Long = 0
-        return solution
+        return solution.toString()
     }
 }
 
