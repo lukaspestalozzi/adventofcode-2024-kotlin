@@ -1,21 +1,21 @@
 import me.tongfei.progressbar.ProgressBar
-import org.jgrapht.Graph
-import org.jgrapht.GraphPath
+import org.jgrapht.alg.shortestpath.DijkstraManyToManyShortestPaths
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath
-import org.jgrapht.alg.shortestpath.YenShortestPathIterator
-import org.jgrapht.graph.DefaultDirectedWeightedGraph
+import org.jgrapht.graph.SimpleGraph
+import kotlin.math.abs
 
-class Day20 : AbstractSolver("20", "1497", "") {
+class Day20 : AbstractSolver("20", "", "") {
     companion object {
         const val WALL = '#'
-        const val FLOOR = '.'
-        const val L1: Short = 1
-        const val L2: Short = 2
-        const val LConnect: Short = 0
     }
+
 
     private enum class Direction {
         UP, DOWN, LEFT, RIGHT;
+    }
+
+    private data class Shortcut(val source: Pos, val target: Pos) {
+
     }
 
     private data class Pos(val row: Int, val col: Int) {
@@ -65,9 +65,7 @@ class Day20 : AbstractSolver("20", "1497", "") {
         }
     }
 
-    private data class Node(val pos: Pos, val level: Short)
-    private data class Edge(val source: Pos, val target: Pos, val level: Short)
-
+    private data class Edge(val source: Pos, val target: Pos)
     private data class Input(val grid: Grid, val start: Pos, val end: Pos)
 
     private fun createInput(input: List<String>, printInput: Boolean = false): Input {
@@ -92,21 +90,22 @@ class Day20 : AbstractSolver("20", "1497", "") {
 
     override fun solvePart1(inputLines: List<String>): String {
         val input = createInput(inputLines, true)
+        val startNode = input.start
+        val endNode = input.end
         val mazeGraph = createInitialGraph(input)
-        val shortcuts = findPossibleShortcuts(input.grid, mazeGraph)
-        val startNode = Node(input.start, L1)
         // baseline
-        val noShortcut = DijkstraShortestPath(mazeGraph).getPath(startNode, Node(input.end, L1)).weight
-        val endNode = Node(input.end, L2)
+        val referencePath = DijkstraShortestPath(mazeGraph).getPath(startNode, endNode)
+        val referencePathLength = referencePath.weight
+
+        // shortcuts
+        val shortcuts = findPossibleShortcuts(input.grid, referencePath.vertexList)
         var solution: Long = 0
         for ((sourcePos, targetPos) in ProgressBar.wrap(shortcuts, "shortcuts")) {
-            val sNode = Node(sourcePos, L1)
-            val tNode = Node(targetPos, L1)
-            val edge = Edge(sourcePos, targetPos, L1)
-            mazeGraph.addEdge(sNode, tNode, edge)
+            val edge = Edge(sourcePos, targetPos)
+            mazeGraph.addEdge(sourcePos, targetPos, edge)
             val algo = DijkstraShortestPath(mazeGraph)
-            val w = algo.getPath(startNode, Node(input.end, L1)).weight
-            val saved = noShortcut - w
+            val w = algo.getPath(startNode, endNode).weight
+            val saved = referencePathLength - w
             //logger.info { "path ${w} baseline: $noShortcut -> $saved" }
             if (saved >= 100) {
                 solution++
@@ -114,51 +113,19 @@ class Day20 : AbstractSolver("20", "1497", "") {
             mazeGraph.removeEdge(edge)
         }
         return solution.toString()
-        // connect the lower and upper graph
-//        for ((sourcePos, targetPos) in shortcuts) {
-//            val sNode = Node(sourcePos, L1)
-//            val tNode = Node(targetPos, L2)
-//            val edge = Edge(sourcePos, targetPos, LConnect)
-//            check(mazeGraph.addEdge(sNode, tNode, edge))
-//        }
-//
-//
-//        val algo = YenShortestPathIterator(mazeGraph, startNode, endNode)
-//        val paths = mutableSetOf<GraphPath<Node, Edge>>()
-//        while (algo.hasNext()) {
-//            val path = algo.next()
-//            paths.add(path)
-//            val saved = noShortcut - path.weight
-//            logger.info { "path ${path.weight} baseline: $noShortcut -> $saved" }
-//            if (saved > 100) {
-//                solution++
-//            } else {
-//                return solution.toString()
-//            }
-//        }
-//        return solution.toString()
     }
 
-    private fun createInitialGraph(input: Input): DefaultDirectedWeightedGraph<Node, Edge> {
+    private fun createInitialGraph(input: Input): SimpleGraph<Pos, Edge> {
         val grid = input.grid
-        val graph = DefaultDirectedWeightedGraph<Node, Edge>(Edge::class.java)
+        val graph = SimpleGraph<Pos, Edge>(Edge::class.java)
         for (pos in grid.positions()) {
             if (grid.charAt(pos) != WALL) {
-                val nodeLevel1 = Node(pos, L1)
-                graph.addVertex(nodeLevel1)
-                val nodeLevel2 = Node(pos, L2)
-                graph.addVertex(nodeLevel2)
+                graph.addVertex(pos)
                 for (d in Direction.entries) {
                     val nabo = pos.move(d)
                     if (grid.charAt(nabo) != WALL) {
-                        val naboLevel1 = Node(nabo, L1)
-                        graph.addVertex(naboLevel1)
-                        graph.addEdge(nodeLevel1, naboLevel1, Edge(source = pos, target = nabo, level = L1))
-                        graph.addEdge(naboLevel1, nodeLevel1, Edge(source = nabo, target = pos, level = L1))
-                        val naboLevel2 = Node(nabo, L2)
-                        graph.addVertex(naboLevel2)
-                        graph.addEdge(nodeLevel2, naboLevel2, Edge(source = pos, target = nabo, level = L2))
-                        graph.addEdge(naboLevel2, nodeLevel2, Edge(source = nabo, target = pos, level = L2))
+                        graph.addVertex(nabo)
+                        graph.addEdge(pos, nabo, Edge(source = pos, target = nabo))
                     }
                 }
             }
@@ -168,7 +135,7 @@ class Day20 : AbstractSolver("20", "1497", "") {
 
     private fun findPossibleShortcuts(
         grid: Grid,
-        graph: DefaultDirectedWeightedGraph<Node, Edge>
+        referencePath: List<Pos>
     ): List<Pair<Pos, Pos>> {
         val shortcuts: MutableList<Pair<Pos, Pos>> = mutableListOf()
         for (pos in grid.positions()) {
@@ -178,7 +145,9 @@ class Day20 : AbstractSolver("20", "1497", "") {
                     if (grid.charAt(shouldBeWall) == WALL) {
                         val shortcutTarget = shouldBeWall.move(d)
                         if (grid.charAt(shortcutTarget) != WALL) {
-                            shortcuts.add(Pair(pos, shortcutTarget))
+                            if (referencePath.indexOf(pos) < referencePath.indexOf(shortcutTarget)) {
+                                shortcuts.add(Pair(pos, shortcutTarget))
+                            }
                         }
                     }
                 }
@@ -187,93 +156,42 @@ class Day20 : AbstractSolver("20", "1497", "") {
         return shortcuts
     }
 
-    private fun print(graph: Graph<Node, Edge>, dim: Int, level: Short) {
-        println("Level: $level")
-        for (rowIdx in 0..<dim) {
-            for (colIdx in 0..<dim) {
-                val nodeL1 = Node(Pos(rowIdx, colIdx), level)
-                if (graph.containsVertex(nodeL1)) {
-                    print('.')
-                } else {
-                    print(WALL)
-                }
-            }
-            println()
-        }
-        println()
-    }
-
-    private fun printConnections(graph: Graph<Node, Edge>, dim: Int) {
-        for (rowIdx in 0..<dim) {
-            for (colIdx in 0..<dim) {
-                val pos: Pos = Pos(rowIdx, colIdx)
-                val nodeL1 = Node(pos, L1)
-                val eStart = graph.edgeSet().filter { it.level == LConnect && it.source == pos }.firstOrNull()
-                if (eStart != null) {
-                    print('1')
-                }
-                val eEnd = graph.edgeSet().filter { it.level == LConnect && it.target == pos }.firstOrNull()
-                if (eEnd != null) {
-                    print('2')
-                } else if (graph.containsVertex(nodeL1)) {
-                    print('.')
-                } else {
-                    print(WALL)
-                }
-            }
-            println()
-        }
-        println()
-    }
-
     override fun solvePart2(inputLines: List<String>): String {
-        return ""
         val input = createInput(inputLines, true)
+        var solution = 0
+        val startNode = input.start
+        val endNode = input.end
         val mazeGraph = createInitialGraph(input)
-        val shortcuts = findPossibleShortcuts(input.grid, mazeGraph)
-        val startNode = Node(input.start, L1)
+        val algo = DijkstraManyToManyShortestPaths(mazeGraph)
         // baseline
-        val noShortcut = DijkstraShortestPath(mazeGraph).getPath(startNode, Node(input.end, L1)).weight
-        val endNode = Node(input.end, L2)
-        var solution: Long = 0
-        for ((sourcePos, targetPos) in ProgressBar.wrap(shortcuts, "shortcuts")) {
-            val sNode = Node(sourcePos, L1)
-            val tNode = Node(targetPos, L1)
-            val edge = Edge(sourcePos, targetPos, L1)
-            mazeGraph.addEdge(sNode, tNode, edge)
-            val algo = DijkstraShortestPath(mazeGraph)
-            val w = algo.getPath(startNode, Node(input.end, L1)).weight
-            val saved = noShortcut - w
-            //logger.info { "path ${w} baseline: $noShortcut -> $saved" }
-            if (saved >= 100) {
-                solution++
+        val referencePath = algo.getPath(startNode, endNode)
+        val referencePathLength = referencePath.weight
+        logger.info { "baseline: $referencePathLength" }
+        val MIN_SAVE = 100
+        val positions = referencePath.vertexList
+        val pb = ProgressBar("outer", (positions.size.toLong() * positions.size.toLong() - 1) / 2)
+        for (idx in 0..<positions.size) {
+            for (idx2 in (idx + MIN_SAVE)..<positions.size) {
+                pb.step()
+                val pos1 = positions[idx]
+                val pos2 = positions[idx2]
+                val distance = distance(pos1, pos2)
+                if (distance <= 20) {
+                    // valid Shortcut
+                    val saved = (idx2 - idx) - distance
+                    //logger.info { "$pos1 -> $pos2 => $saved (($idx2 - $idx) - $distance )" }
+                    if (saved >= MIN_SAVE) {
+                        solution++
+                    }
+                }
             }
-            mazeGraph.removeEdge(edge)
         }
+
         return solution.toString()
-        // connect the lower and upper graph
-//        for ((sourcePos, targetPos) in shortcuts) {
-//            val sNode = Node(sourcePos, L1)
-//            val tNode = Node(targetPos, L2)
-//            val edge = Edge(sourcePos, targetPos, LConnect)
-//            check(mazeGraph.addEdge(sNode, tNode, edge))
-//        }
-//
-//
-//        val algo = YenShortestPathIterator(mazeGraph, startNode, endNode)
-//        val paths = mutableSetOf<GraphPath<Node, Edge>>()
-//        while (algo.hasNext()) {
-//            val path = algo.next()
-//            paths.add(path)
-//            val saved = noShortcut - path.weight
-//            logger.info { "path ${path.weight} baseline: $noShortcut -> $saved" }
-//            if (saved > 100) {
-//                solution++
-//            } else {
-//                return solution.toString()
-//            }
-//        }
-//        return solution.toString()
+    }
+
+    private fun distance(pos1: Pos, pos2: Pos): Int {
+        return abs(pos1.row - pos2.row) + abs(pos1.col - pos2.col)
     }
 }
 
