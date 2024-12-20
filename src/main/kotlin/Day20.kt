@@ -1,10 +1,11 @@
 import me.tongfei.progressbar.ProgressBar
-import org.jgrapht.alg.shortestpath.DijkstraManyToManyShortestPaths
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath
 import org.jgrapht.graph.SimpleGraph
 import kotlin.math.abs
 
-class Day20 : AbstractSolver("20", "", "") {
+class Day20 : AbstractSolver(
+    "20", "1497", "1030809" // Note: those are the expected solutions on the real input
+) {
     companion object {
         const val WALL = '#'
     }
@@ -93,25 +94,9 @@ class Day20 : AbstractSolver("20", "", "") {
         val startNode = input.start
         val endNode = input.end
         val mazeGraph = createInitialGraph(input)
-        // baseline
-        val referencePath = DijkstraShortestPath(mazeGraph).getPath(startNode, endNode)
-        val referencePathLength = referencePath.weight
-
-        // shortcuts
-        val shortcuts = findPossibleShortcuts(input.grid, referencePath.vertexList)
-        var solution: Long = 0
-        for ((sourcePos, targetPos) in ProgressBar.wrap(shortcuts, "shortcuts")) {
-            val edge = Edge(sourcePos, targetPos)
-            mazeGraph.addEdge(sourcePos, targetPos, edge)
-            val algo = DijkstraShortestPath(mazeGraph)
-            val w = algo.getPath(startNode, endNode).weight
-            val saved = referencePathLength - w
-            //logger.info { "path ${w} baseline: $noShortcut -> $saved" }
-            if (saved >= 100) {
-                solution++
-            }
-            mazeGraph.removeEdge(edge)
-        }
+        val algo = DijkstraShortestPath(mazeGraph)
+        val referencePath = algo.getPath(startNode, endNode)
+        val solution = countShortcuts(referencePath.vertexList, 100, 2)
         return solution.toString()
     }
 
@@ -133,60 +118,38 @@ class Day20 : AbstractSolver("20", "", "") {
         return graph
     }
 
-    private fun findPossibleShortcuts(
-        grid: Grid,
-        referencePath: List<Pos>
-    ): List<Pair<Pos, Pos>> {
-        val shortcuts: MutableList<Pair<Pos, Pos>> = mutableListOf()
-        for (pos in grid.positions()) {
-            if (grid.charAt(pos) != WALL) {
-                for (d in Direction.entries) {
-                    val shouldBeWall = pos.move(d)
-                    if (grid.charAt(shouldBeWall) == WALL) {
-                        val shortcutTarget = shouldBeWall.move(d)
-                        if (grid.charAt(shortcutTarget) != WALL) {
-                            if (referencePath.indexOf(pos) < referencePath.indexOf(shortcutTarget)) {
-                                shortcuts.add(Pair(pos, shortcutTarget))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return shortcuts
-    }
-
-    override fun solvePart2(inputLines: List<String>): String {
-        val input = createInput(inputLines, true)
+    private fun countShortcuts(referencePath: List<Pos>, minRequiredSave: Int, maxDistance: Int): Int {
+        val referencePathLength = referencePath.size
         var solution = 0
-        val startNode = input.start
-        val endNode = input.end
-        val mazeGraph = createInitialGraph(input)
-        val algo = DijkstraManyToManyShortestPaths(mazeGraph)
-        // baseline
-        val referencePath = algo.getPath(startNode, endNode)
-        val referencePathLength = referencePath.weight
         logger.info { "baseline: $referencePathLength" }
-        val MIN_SAVE = 100
-        val positions = referencePath.vertexList
-        val pb = ProgressBar("outer", (positions.size.toLong() * positions.size.toLong() - 1) / 2)
-        for (idx in 0..<positions.size) {
-            for (idx2 in (idx + MIN_SAVE)..<positions.size) {
+        val pb = ProgressBar("outer", (referencePath.size.toLong() * referencePath.size.toLong() - 1) / 2)
+        for (idx in referencePath.indices) {
+            for (idx2 in (idx + minRequiredSave)..<referencePath.size) {
                 pb.step()
-                val pos1 = positions[idx]
-                val pos2 = positions[idx2]
+                val pos1 = referencePath[idx]
+                val pos2 = referencePath[idx2]
                 val distance = distance(pos1, pos2)
-                if (distance <= 20) {
+                if (distance <= maxDistance) {
                     // valid Shortcut
                     val saved = (idx2 - idx) - distance
                     //logger.info { "$pos1 -> $pos2 => $saved (($idx2 - $idx) - $distance )" }
-                    if (saved >= MIN_SAVE) {
+                    if (saved >= minRequiredSave) {
                         solution++
                     }
                 }
             }
         }
+        return solution
+    }
 
+    override fun solvePart2(inputLines: List<String>): String {
+        val input = createInput(inputLines, true)
+        val startNode = input.start
+        val endNode = input.end
+        val mazeGraph = createInitialGraph(input)
+        val algo = DijkstraShortestPath(mazeGraph)
+        val referencePath = algo.getPath(startNode, endNode)
+        val solution = countShortcuts(referencePath.vertexList, 100, 20)
         return solution.toString()
     }
 
