@@ -1,5 +1,5 @@
 fun main() {
-    val solver = Day19()
+    val solver = Day20()
 
     val logger = solver.logger
 
