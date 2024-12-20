@@ -1,8 +1,11 @@
+import me.tongfei.progressbar.ProgressBar
 import org.jgrapht.Graph
+import org.jgrapht.GraphPath
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath
+import org.jgrapht.alg.shortestpath.YenShortestPathIterator
 import org.jgrapht.graph.DefaultDirectedWeightedGraph
 
-class Day20 : AbstractSolver("20", "11", "") {
+class Day20 : AbstractSolver("20", "1497", "") {
     companion object {
         const val WALL = '#'
         const val FLOOR = '.'
@@ -92,15 +95,20 @@ class Day20 : AbstractSolver("20", "11", "") {
         val mazeGraph = createInitialGraph(input)
         val shortcuts = findPossibleShortcuts(input.grid, mazeGraph)
         val startNode = Node(input.start, L1)
-        val endNode = Node(input.end, L1)
+        // baseline
+        val noShortcut = DijkstraShortestPath(mazeGraph).getPath(startNode, Node(input.end, L1)).weight
+        val endNode = Node(input.end, L2)
         var solution: Long = 0
-        for ((sourcePos, targetPos) in shortcuts) {
+        for ((sourcePos, targetPos) in ProgressBar.wrap(shortcuts, "shortcuts")) {
             val sNode = Node(sourcePos, L1)
             val tNode = Node(targetPos, L1)
             val edge = Edge(sourcePos, targetPos, L1)
             mazeGraph.addEdge(sNode, tNode, edge)
             val algo = DijkstraShortestPath(mazeGraph)
-            if (algo.getPath(startNode, endNode).weight <= 100) {
+            val w = algo.getPath(startNode, Node(input.end, L1)).weight
+            val saved = noShortcut - w
+            //logger.info { "path ${w} baseline: $noShortcut -> $saved" }
+            if (saved >= 100) {
                 solution++
             }
             mazeGraph.removeEdge(edge)
@@ -113,14 +121,16 @@ class Day20 : AbstractSolver("20", "11", "") {
 //            val edge = Edge(sourcePos, targetPos, LConnect)
 //            check(mazeGraph.addEdge(sNode, tNode, edge))
 //        }
-//        print(mazeGraph, 15, L1)
-//        print(mazeGraph, 15, L2)
-//        printConnections(mazeGraph, 15)
+//
 //
 //        val algo = YenShortestPathIterator(mazeGraph, startNode, endNode)
+//        val paths = mutableSetOf<GraphPath<Node, Edge>>()
 //        while (algo.hasNext()) {
 //            val path = algo.next()
-//            if (path.weight <= 100) {
+//            paths.add(path)
+//            val saved = noShortcut - path.weight
+//            logger.info { "path ${path.weight} baseline: $noShortcut -> $saved" }
+//            if (saved > 100) {
 //                solution++
 //            } else {
 //                return solution.toString()
@@ -136,8 +146,8 @@ class Day20 : AbstractSolver("20", "11", "") {
             if (grid.charAt(pos) != WALL) {
                 val nodeLevel1 = Node(pos, L1)
                 graph.addVertex(nodeLevel1)
-//                val nodeLevel2 = Node(pos, L2)
-//                graph.addVertex(nodeLevel2)
+                val nodeLevel2 = Node(pos, L2)
+                graph.addVertex(nodeLevel2)
                 for (d in Direction.entries) {
                     val nabo = pos.move(d)
                     if (grid.charAt(nabo) != WALL) {
@@ -145,9 +155,10 @@ class Day20 : AbstractSolver("20", "11", "") {
                         graph.addVertex(naboLevel1)
                         graph.addEdge(nodeLevel1, naboLevel1, Edge(source = pos, target = nabo, level = L1))
                         graph.addEdge(naboLevel1, nodeLevel1, Edge(source = nabo, target = pos, level = L1))
-//                        val naboLevel2 = Node(pos, L2)
-//                        graph.addEdge(nodeLevel2, naboLevel2, Edge(source = pos, target = nabo, level = L2))
-//                        graph.addEdge(naboLevel2, nodeLevel2, Edge(source = nabo, target = pos, level = L2))
+                        val naboLevel2 = Node(nabo, L2)
+                        graph.addVertex(naboLevel2)
+                        graph.addEdge(nodeLevel2, naboLevel2, Edge(source = pos, target = nabo, level = L2))
+                        graph.addEdge(naboLevel2, nodeLevel2, Edge(source = nabo, target = pos, level = L2))
                     }
                 }
             }
@@ -216,9 +227,53 @@ class Day20 : AbstractSolver("20", "11", "") {
     }
 
     override fun solvePart2(inputLines: List<String>): String {
-        val input = createInput(inputLines)
+        return ""
+        val input = createInput(inputLines, true)
+        val mazeGraph = createInitialGraph(input)
+        val shortcuts = findPossibleShortcuts(input.grid, mazeGraph)
+        val startNode = Node(input.start, L1)
+        // baseline
+        val noShortcut = DijkstraShortestPath(mazeGraph).getPath(startNode, Node(input.end, L1)).weight
+        val endNode = Node(input.end, L2)
         var solution: Long = 0
+        for ((sourcePos, targetPos) in ProgressBar.wrap(shortcuts, "shortcuts")) {
+            val sNode = Node(sourcePos, L1)
+            val tNode = Node(targetPos, L1)
+            val edge = Edge(sourcePos, targetPos, L1)
+            mazeGraph.addEdge(sNode, tNode, edge)
+            val algo = DijkstraShortestPath(mazeGraph)
+            val w = algo.getPath(startNode, Node(input.end, L1)).weight
+            val saved = noShortcut - w
+            //logger.info { "path ${w} baseline: $noShortcut -> $saved" }
+            if (saved >= 100) {
+                solution++
+            }
+            mazeGraph.removeEdge(edge)
+        }
         return solution.toString()
+        // connect the lower and upper graph
+//        for ((sourcePos, targetPos) in shortcuts) {
+//            val sNode = Node(sourcePos, L1)
+//            val tNode = Node(targetPos, L2)
+//            val edge = Edge(sourcePos, targetPos, LConnect)
+//            check(mazeGraph.addEdge(sNode, tNode, edge))
+//        }
+//
+//
+//        val algo = YenShortestPathIterator(mazeGraph, startNode, endNode)
+//        val paths = mutableSetOf<GraphPath<Node, Edge>>()
+//        while (algo.hasNext()) {
+//            val path = algo.next()
+//            paths.add(path)
+//            val saved = noShortcut - path.weight
+//            logger.info { "path ${path.weight} baseline: $noShortcut -> $saved" }
+//            if (saved > 100) {
+//                solution++
+//            } else {
+//                return solution.toString()
+//            }
+//        }
+//        return solution.toString()
     }
 }
 
