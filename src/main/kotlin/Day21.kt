@@ -93,24 +93,6 @@ class Day21 : AbstractSolver("21", "126384", "") {
         return Move(u = up, d = down, l = left, r = right, order = order)
     }
 
-    private fun directionalKeypad(code: String): List<Move> {
-        var currChar = A
-        val commands = mutableListOf<Move>()
-        for (c in code) {
-            commands.add(directionalKeypad(currChar, c))
-            currChar = c
-        }
-        return commands
-    }
-
-    private fun directionalKeypad(moves: List<Move>): List<Move> {
-        val commands = mutableListOf<Move>()
-        for (move in moves) {
-            commands.addAll(directionalKeypad(move))
-        }
-        return commands
-    }
-
     private fun directionalKeypad(move: Move): List<Move> {
         check(move.order != Order.BOTH)
         var currChar = A
@@ -187,6 +169,7 @@ class Day21 : AbstractSolver("21", "126384", "") {
     }
 
     override fun solvePart1(inputLines: List<String>): String {
+        CACHE.clear()
         val input = createInput(inputLines, true)
         check(numericKeypad('A', '0') == Move(l = 1)) { numericKeypad('A', '0') }
         check(numericKeypad('0', '2') == Move(u = 1)) { numericKeypad('0', '2') }
@@ -200,41 +183,20 @@ class Day21 : AbstractSolver("21", "126384", "") {
         var solution: Long = 0
 
         for (case in input.cases) {
-            val dirpadCommandsYou = solveCase(case.code, level = 1)
+            var result = 0L
+            val numpadCommands = numericKeypad(case.code)
+            for (move in numpadCommands) {
+                val res = determineShortestCommands(1, move)
+                result += res
+            }
 
-            logger.info { "$case -> (len=${dirpadCommandsYou.sumOf { it.length() }}) ${dirpadCommandsYou.joinToString("") { it.plot() }} " }
-            solution += (dirpadCommandsYou.sumOf { it.length() } * case.code.substringBefore('A').toInt())
+            solution += (result * case.code.substringBefore('A').toInt())
         }
 
         return solution.toString()
     }
 
-    private fun solveCase(code: String, level: Int): List<Move> {
-        val result = mutableListOf<Move>()
-        val numpadCommands = numericKeypad(code)
-        for (move in numpadCommands) {
-            val res = solve(level, move)
-            result.addAll(res)
-        }
-        return result
-    }
-
-    private fun solve(level: Int, move: Move): List<Move> {
-        if (level == -1) {
-            return Collections.singletonList(move)
-        }
-       val  result= if (move.order == Order.BOTH) {
-            val vh = Move(u = move.u, d = move.d, l = move.l, r = move.r, order = Order.VH)
-            val hv = Move(u = move.u, d = move.d, l = move.l, r = move.r, order = Order.HV)
-            val resVh = solve(level, vh)
-            val resHv = solve(level, hv)
-            if (resVh.sumOf { it.length() } < resHv.sumOf { it.length() }) resVh else resHv
-        } else {
-            directionalKeypad(move).flatMap { solve(level - 1, it) }
-        }
-        return result
-    }
-    private fun solve2(level: Int, move: Move): Long {
+    private fun determineShortestCommands(level: Int, move: Move): Long {
         if (level == -1) {
             return move.length().toLong()
         }
@@ -244,17 +206,18 @@ class Day21 : AbstractSolver("21", "126384", "") {
        val  result= if (move.order == Order.BOTH) {
             val vh = Move(u = move.u, d = move.d, l = move.l, r = move.r, order = Order.VH)
             val hv = Move(u = move.u, d = move.d, l = move.l, r = move.r, order = Order.HV)
-            val resVh = solve2(level, vh)
-            val resHv = solve2(level, hv)
+            val resVh = determineShortestCommands(level, vh)
+            val resHv = determineShortestCommands(level, hv)
             if (resVh < resHv) resVh else resHv
         } else {
-            directionalKeypad(move).sumOf { solve2(level - 1, it) }
+            directionalKeypad(move).sumOf { determineShortestCommands(level - 1, it) }
         }
         CACHE[Pair(move, level)] = result
         return result
     }
 
     override fun solvePart2(inputLines: List<String>): String {
+        CACHE.clear()
         val input = createInput(inputLines, true)
         var solution: Long = 0
 
@@ -262,7 +225,7 @@ class Day21 : AbstractSolver("21", "126384", "") {
             var result = 0L
             val numpadCommands = numericKeypad(case.code)
             for (move in numpadCommands) {
-                val res = solve2(24, move)
+                val res = determineShortestCommands(24, move)
                 result += res
             }
 
