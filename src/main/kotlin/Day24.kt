@@ -126,7 +126,10 @@ class Day24 : AbstractSolver("24", "2024", "") {
     // x15 XOR y15 -> jqf swap with x15 AND y15 -> skh
 
     // 4:
-    //
+    // best: Swap(idx1=44, idx2=50, origGate1=Gate(in1=wfc, in2=cmp, out=mdd, type=XOR), origGate2=Gate(in1=y19, in2=x19, out=z19, type=AND), swappedGate1=Gate(in1=wfc, in2=cmp, out=z19, type=XOR), swappedGate2=Gate(in1=y19, in2=x19, out=mdd, type=AND))=0
+    // wfc XOR cmp -> mdd swap with y19 AND x19 -> z19
+
+    // jqf,mdd,skh,wpd,wts,z11,z19,z37
 
 
     private fun findBestSwap(initGates: List<Gate>, initWires: List<WireValue>, scoreToBeat: Int): Map<Swap, Int> {
