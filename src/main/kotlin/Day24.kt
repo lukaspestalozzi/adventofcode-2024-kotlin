@@ -121,11 +121,18 @@ class Day24 : AbstractSolver("24", "2024", "") {
     // 2:
     // best: Swap(origGate1=Gate(in1=qqw, in2=gkc, out=wpd, type=XOR), origGate2=Gate(in1=gkc, in2=qqw, out=z11, type=AND), swappedGate1=Gate(in1=qqw, in2=gkc, out=z11, type=XOR), swappedGate2=Gate(in1=gkc, in2=qqw, out=wpd, type=AND))=316
     // qqw XOR gkc -> wpd swap with gkc AND qqw -> z11
+    // 3:
+    // best: Swap(origGate1=Gate(in1=x15, in2=y15, out=jqf, type=XOR), origGate2=Gate(in1=x15, in2=y15, out=skh, type=AND), swappedGate1=Gate(in1=x15, in2=y15, out=skh, type=XOR), swappedGate2=Gate(in1=x15, in2=y15, out=jqf, type=AND))=151
+    // x15 XOR y15 -> jqf swap with x15 AND y15 -> skh
+
+    // 4:
+    //
+
 
     private fun findBestSwap(initGates: List<Gate>, initWires: List<WireValue>, scoreToBeat: Int): Map<Swap, Int> {
         val swapCandidates: MutableMap<Swap, Int> = mutableMapOf()
         val pb = ProgressBar("testing swaps", 100)
-        for (i in 0..<100) {
+        for (i in 0..<10) {
             pb.step()
             val wires = initWires.map { WireValue(it.name, nextBoolean()) }
             val gates = initGates.toMutableList()
@@ -147,7 +154,7 @@ class Day24 : AbstractSolver("24", "2024", "") {
                     val sc = test(gates, wires)
                     swapCandidates[swap] = swapCandidates.getOrDefault(swap, 0) + sc
 //                    if (sc == 0) {
-//                        logger.error { "Found perfect solution $swap" }
+//                        logger.info { "Score 0: $swap" }
 //                    }
 //                if (sc < scoreToBeat) {
 //                    logger.info { "swapped $idx1, $idx2: $gate1, $gate2" }
